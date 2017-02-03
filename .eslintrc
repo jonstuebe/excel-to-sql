@@ -1,0 +1,5 @@
+---
+"extends":
+  - "formidable"
+"rules":
+    "quotes": ["error", "single"]
