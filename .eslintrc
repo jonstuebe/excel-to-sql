@@ -1,5 +1,4 @@
----
-"extends":
-  - "formidable"
-"rules":
-    "quotes": ["error", "single"]
+{
+  "parser": "babel-eslint",
+  "extends": "airbnb"
+}

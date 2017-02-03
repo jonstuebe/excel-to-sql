@@ -8,23 +8,25 @@ import moment from 'moment';
 export default class ExcelToSql {
 
   constructor(options) {
-
     this.options = _.merge({
       dbClient: 'postgresql',
       dbDebug: false,
       defaultSheet: 'data',
-      columns: []
+      columns: [],
     }, options);
+    /* eslint-disable */
     this.knex = require('knex')({
       client: this.options.dbClient
     });
+    /* eslint-enable */
     this.query = [];
-
   }
 
+  /* eslint-disable class-methods-use-this */
   renderDate(value) {
     return moment(value, 'MM/DD/YY').format('YYYY-MM-DD HH:mm:ss+00').toString();
   }
+  /* eslint-enable */
 
   toSQL(data) {
     return _.compact(_.map(data, (row, index) => {
@@ -45,7 +47,6 @@ export default class ExcelToSql {
 
   transformData(data) {
     return _.map(data, (oldRow) => {
-
       /* eslint-disable prefer-const */
       let row = oldRow;
       let dateFormat = 'YYYY-MM-DD HH:mm:ss+00';
@@ -71,22 +72,16 @@ export default class ExcelToSql {
   }
 
   to(path, type = 'sql', file = true) {
-
     return this
     .getData()
-    .then((data) => {
-      return this.transformData(data);
-    })
+    .then(data => this.transformData(data))
     .then((data) => {
       if (type === 'sql') {
         return this.toSQL(data);
-      } else {
-        return data;
       }
+      return data;
     })
-    .then((data) => {
-      return `BEGIN;\n\n${data.join(';\n')};\n\nCOMMIT;`;
-    })
+    .then(data => `BEGIN;\n\n${data.join(';\n')};\n\nCOMMIT;`)
     .then((data) => {
       if (file === true) {
         fs.writeFileSync(path, data, 'utf-8');
@@ -94,6 +89,5 @@ export default class ExcelToSql {
       }
       return data;
     });
-
   }
 }
