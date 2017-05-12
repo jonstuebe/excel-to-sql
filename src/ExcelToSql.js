@@ -11,7 +11,8 @@ export default class ExcelToSql {
         dbClient: "postgresql",
         dbDebug: false,
         defaultSheet: "data",
-        columns: []
+        columns: [],
+        type: "insert"
       },
       options
     );
@@ -31,7 +32,14 @@ export default class ExcelToSql {
     return _.compact(
       _.map(data, (row, index) => {
         if (index > 0) {
-          return this.knex(this.options.tableName).insert(row).toString();
+          if (this.options.type === "insert") {
+            return this.knex(this.options.tableName).insert(row).toString();
+          } else if (this.options.type === "update") {
+            return this.knex(this.options.tableName)
+              .where(this.options.where, row[this.options.where])
+              .update(_.omit(row, this.options.where))
+              .toString();
+          }
         }
         return null;
       })
@@ -50,13 +58,15 @@ export default class ExcelToSql {
     return _.map(data, oldRow => {
       let row = oldRow;
       let dateFormat = "YYYY-MM-DD HH:mm:ss+00";
+
       _.each(row, (cell, name) => {
         if (cell.match(/^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{2}/)) {
           row[name] = moment(cell, "M/DD/YYYY").format(dateFormat).toString();
         }
         if (
           this.options.columns.length > 0 &&
-          !_.includes(this.options.columns, name)
+          !_.includes(this.options.columns, name) &&
+          name !== this.options.where
         ) {
           delete row[name];
         }
