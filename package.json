@@ -1,6 +1,6 @@
 {
   "name": "excel-to-sql",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "main": "./lib/ExcelToSql.js",
   "author": "Jon jstuebe@gmail.com",
   "license": "MIT",
